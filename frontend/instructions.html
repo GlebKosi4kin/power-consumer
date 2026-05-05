@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Инструкция — Мониторинг энергопотребления</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>&#9889; Мониторинг энергопотребления</h1>
+    <span class="subtitle">Производственные линии &middot;</span>
+    <nav>
+      <a href="index.html">Дашборд</a>
+      <a href="instructions.html" class="active">Инструкция</a>
+      <a href="contacts.html">Контакты</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-content">
+
+  <div class="card page-section">
+    <h2>&#128640; Быстрый старт</h2>
+    <div class="step"><span class="step-num">1</span>
+      <p>Убедитесь, что установлены <code>Docker</code> и <code>Docker Compose</code>.</p></div>
+    <div class="step"><span class="step-num">2</span>
+      <p>Откройте терминал в папке проекта и выполните: <code>make up</code></p></div>
+    <div class="step"><span class="step-num">3</span>
+      <p>Дождитесь сборки (~10 мин при первом запуске — компилируется Scala-бэкенд).</p></div>
+    <div class="step"><span class="step-num">4</span>
+      <p>Откройте <a href="index.html" style="color:var(--accent)">http://localhost</a> в браузере.</p></div>
+  </div>
+
+  <div class="card page-section">
+    <h2>&#128202; Работа с дашбордом</h2>
+    <ul>
+      <li>Выберите дату и нажмите <strong>«Показать день»</strong> — показывается почасовой график за выбранный день.</li>
+      <li>Кнопка <strong>«Показать январь»</strong> переключает на месячный график с суточными итогами и пиками.</li>
+      <li>Красные столбцы на почасовом графике — <strong>аномальные выбросы</strong>.</li>
+      <li>Красные точки на месячном графике — дни, содержащие хотя бы одну аномалию.</li>
+      <li>Панель «Аномальные выбросы» показывает конкретные часы с нарушениями и рекомендациями.</li>
+    </ul>
+  </div>
+
+  <div class="card page-section">
+    <h2>&#9200; Периоды суток</h2>
+    <ul>
+      <li><span class="period-tag tag-night">T1 Ночь</span> 00:00&ndash;05:00 &mdash; ожидаемые 5&ndash;10 МВт&middot;ч, порог: <strong>&gt; 12 МВт&middot;ч</strong></li>
+      <li><span class="period-tag tag-morning">T2 Утро</span> 06:00&ndash;09:00 &mdash; ожидаемые 10&ndash;22 МВт&middot;ч, порог: <strong>&gt; 25 МВт&middot;ч</strong></li>
+      <li><span class="period-tag tag-day">T3 День</span> 10:00&ndash;18:00 &mdash; ожидаемые 22&ndash;27 МВт&middot;ч, порог: <strong>&gt; 30 МВт&middot;ч</strong></li>
+      <li><span class="period-tag tag-evening">T2 Вечер</span> 19:00&ndash;23:00 &mdash; ожидаемые 10&ndash;20 МВт&middot;ч, порог: <strong>&gt; 23 МВт&middot;ч</strong></li>
+    </ul>
+  </div>
+
+  <div class="card page-section">
+    <h2>&#128295; Команды управления</h2>
+    <ul>
+      <li><code>make up</code> &mdash; собрать образы, запустить все контейнеры и наполнить БД данными</li>
+      <li><code>make down</code> &mdash; остановить все контейнеры</li>
+      <li><code>make generate</code> &mdash; повторно запустить генератор</li>
+      <li><code>make logs</code> &mdash; смотреть логи всех сервисов в реальном времени</li>
+      <li><code>make clean</code> &mdash; полный сброс: удалить контейнеры и тома</li>
+      <li><code>make status</code> &mdash; статус запущенных контейнеров</li>
+    </ul>
+  </div>
+
+  <div class="card page-section">
+    <h2>&#128200; REST API</h2>
+    <ul>
+      <li><code>GET /api/readings?date=2026-01-15</code> &mdash; почасовые данные за день</li>
+      <li><code>GET /api/anomalies?from=2026-01-01&amp;to=2026-02-01</code> &mdash; только аномалии</li>
+      <li><code>GET /api/stats/daily?date=2026-01-15</code> &mdash; статистика за день</li>
+      <li><code>GET /api/stats/monthly?year=2026&amp;month=1</code> &mdash; статистика за месяц</li>
+    </ul>
+    <p style="margin-top:12px">Базовый URL: <code>http://localhost:9000</code></p>
+  </div>
+
+</div>
+</body>
+</html>
