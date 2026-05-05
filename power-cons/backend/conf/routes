@@ -1,7 +1,0 @@
-GET  /api/readings          controllers.EnergyController.readings(date: Option[String])
-GET  /api/readings/range    controllers.EnergyController.readingsRange(from: String, to: String)
-GET  /api/anomalies         controllers.EnergyController.anomalies(from: String, to: String)
-GET  /api/stats/daily       controllers.EnergyController.dailyStats(date: String)
-GET  /api/stats/monthly     controllers.EnergyController.monthlyStats(year: Int, month: Int)
-
-OPTIONS /*path             controllers.EnergyController.preflight(path: String)
