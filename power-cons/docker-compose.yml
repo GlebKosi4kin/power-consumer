@@ -1,0 +1,93 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: power-cons-db
+    environment:
+      POSTGRES_DB: power_cons
+      POSTGRES_USER: power_user
+      POSTGRES_PASSWORD: power_pass
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - power-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U power_user -d power_cons"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    container_name: power-cons-mqtt
+    volumes:
+      - ./mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - "1883:1883"
+    networks:
+      - power-network
+
+  generator:
+    build: ./generator
+    container_name: power-cons-generator
+    environment:
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      MQTT_TOPIC: mqtt_telemetry
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: power_cons
+      DB_USER: power_user
+      DB_PASSWORD: power_pass
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    networks:
+      - power-network
+    restart: "no"
+
+  backend:
+    build: ./backend
+    container_name: power-cons-backend
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: power_cons
+      DB_USER: power_user
+      DB_PASSWORD: power_pass
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      MQTT_TOPIC: mqtt_telemetry
+      APPLICATION_SECRET: "changeme-for-production-use-256-bits-secret!"
+    ports:
+      - "9000:9000"
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    networks:
+      - power-network
+
+  frontend:
+    build: ./frontend
+    container_name: power-cons-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - power-network
+
+volumes:
+  postgres_data:
+
+networks:
+  power-network:
+    driver: bridge
